@@ -11,7 +11,7 @@
 
 ### Backend
 - **API**: Next.js API Routes (REST API)
-- **Database**: PostgreSQL (via Supabase)
+- **Database**: PostgreSQL (via Neon DB)
 - **ORM**: Prisma
 
 ## Architecture
@@ -32,7 +32,7 @@
 - HTTP status codes for error handling
 - Simple endpoints focused on core CRUD operations
 
-## Supabase Database Schema
+## Database Schema
 
 ### Tables
 
@@ -103,5 +103,5 @@ Prisma will be used as the ORM for its type safety and developer experience:
 
 ## Deployment
 - Vercel for Next.js application hosting
-- Supabase for database
+- Neon DB for database
 - Environment-based configuration 

@@ -14,7 +14,7 @@ A simple tool for collecting and managing questions from your audience.
 - **Frontend**: Next.js 14+ with App Router
 - **Styling**: TailwindCSS
 - **State Management**: Zustand and React Query
-- **Database**: PostgreSQL via Supabase
+- **Database**: PostgreSQL via Neon DB
 - **ORM**: Prisma
 - **Form Handling**: React Hook Form with Zod validation
 
@@ -23,7 +23,7 @@ A simple tool for collecting and managing questions from your audience.
 ### Prerequisites
 
 - Node.js 18+ and npm
-- A Supabase account (free tier is sufficient)
+- A Neon DB account (free tier is sufficient)
 
 ### Step 1: Clone the repository
 
@@ -38,23 +38,19 @@ cd qnatool
 npm install
 ```
 
-### Step 3: Set up Supabase
+### Step 3: Set up Neon DB
 
-1. Create a new Supabase project at [https://supabase.com](https://supabase.com)
-2. Get your Supabase URL and anon key from the project settings
-3. Get your PostgreSQL connection string from the Database settings page
+1. Create a new Neon DB project at [https://neon.tech](https://neon.tech)
+2. Create a new database in your project
+3. Get your PostgreSQL connection string from the Connection Details page
 
 ### Step 4: Configure environment variables
 
 Create a `.env.local` file in the root of the project with the following variables:
 
 ```
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url-here
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key-here
-
-# Database Connection (Get this from Supabase database settings)
-DATABASE_URL=your-postgres-connection-string-here
+# Neon DB Configuration
+DATABASE_URL=your-neon-postgres-connection-string-here
 ```
 
 ### Step 5: Initialize the database

@@ -1,6 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey); 
+// This file is no longer used since we're moving from Supabase to Neon DB
+// The database connection is managed through Prisma in lib/prisma.ts
+// All database operations should use the Prisma client 
