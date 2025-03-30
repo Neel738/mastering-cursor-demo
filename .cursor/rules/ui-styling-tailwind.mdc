@@ -1,0 +1,218 @@
+---
+description: TailwindCSS Styling Best Practices
+globs: *.tsx,*.jsx,*.css
+alwaysApply: false
+---
+
+<rule>
+name: tailwind_styling_best_practices
+description: Guidelines for using TailwindCSS styling effectively in the Q&A platform
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$|\\.css$"
+
+actions:
+  - type: suggest
+    message: |
+      # TailwindCSS Styling Best Practices
+      
+      ## Design System
+      
+      - Create a consistent design system with custom theme extensions
+      - Define reusable color schemes, spacing, and typography
+      - Use CSS variables for dynamic theming
+      
+      ```js
+      // tailwind.config.js
+      /** @type {import('tailwindcss').Config} */
+      module.exports = {
+        darkMode: ["class"],
+        content: [
+          "./pages/**/*.{ts,tsx}",
+          "./components/**/*.{ts,tsx}",
+          "./app/**/*.{ts,tsx}",
+        ],
+        theme: {
+          container: {
+            center: true,
+            padding: "2rem",
+            screens: {
+              "2xl": "1400px",
+            },
+          },
+          extend: {
+            colors: {
+              border: "hsl(var(--border))",
+              input: "hsl(var(--input))",
+              ring: "hsl(var(--ring))",
+              background: "hsl(var(--background))",
+              foreground: "hsl(var(--foreground))",
+              primary: {
+                DEFAULT: "hsl(var(--primary))",
+                foreground: "hsl(var(--primary-foreground))",
+              },
+              secondary: {
+                DEFAULT: "hsl(var(--secondary))",
+                foreground: "hsl(var(--secondary-foreground))",
+              },
+              destructive: {
+                DEFAULT: "hsl(var(--destructive))",
+                foreground: "hsl(var(--destructive-foreground))",
+              },
+              muted: {
+                DEFAULT: "hsl(var(--muted))",
+                foreground: "hsl(var(--muted-foreground))",
+              },
+              accent: {
+                DEFAULT: "hsl(var(--accent))",
+                foreground: "hsl(var(--accent-foreground))",
+              },
+              popover: {
+                DEFAULT: "hsl(var(--popover))",
+                foreground: "hsl(var(--popover-foreground))",
+              },
+              card: {
+                DEFAULT: "hsl(var(--card))",
+                foreground: "hsl(var(--card-foreground))",
+              },
+            },
+            borderRadius: {
+              lg: "var(--radius)",
+              md: "calc(var(--radius) - 2px)",
+              sm: "calc(var(--radius) - 4px)",
+            },
+            keyframes: {
+              "fade-in": {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              "fade-out": {
+                "0%": { opacity: "1" },
+                "100%": { opacity: "0" },
+              },
+            },
+            animation: {
+              "fade-in": "fade-in 200ms ease-in-out",
+              "fade-out": "fade-out 200ms ease-in-out",
+            },
+          },
+        },
+        plugins: [require("tailwindcss-animate")],
+      }
+      ```
+      
+      ## Component Styling
+      
+      - Use utility-first approach for component styling
+      - Create consistent spacing and alignment
+      - Implement responsive design with mobile-first approach
+      - Use Tailwind's group and peer modifiers for interactive elements
+      
+      ```tsx
+      // Good: Responsive mobile-first design with Tailwind
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        {questions.map(question => (
+          <QuestionCard 
+            key={question.id} 
+            question={question}
+            className="h-full" 
+          />
+        ))}
+      </div>
+      
+      // Good: Interactive styling with group
+      <button className="group flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+        <span>Submit</span>
+        <ArrowRightIcon className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+      </button>
+      ```
+      
+      ## Organization
+      
+      - Use consistent class ordering (layout, typography, colors, etc.)
+      - Extract repeated utility patterns to components
+      - Utilize @apply for complex, repeated utility combinations
+      
+      ```css
+      /* In your global CSS */
+      @layer components {
+        .input-base {
+          @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+        }
+        
+        .card-hover {
+          @apply hover:shadow-md transition-shadow duration-200;
+        }
+      }
+      ```
+      
+      ## Dark Mode
+      
+      - Implement proper dark mode support
+      - Test all UI elements in both light and dark modes
+      - Use Tailwind's dark: modifier consistently
+      
+      ```tsx
+      // Good: Dark mode support
+      <div className="bg-background text-foreground dark:bg-slate-950 dark:text-slate-50">
+        <h1 className="text-2xl font-bold text-primary dark:text-primary">Questions</h1>
+        <p className="text-muted-foreground dark:text-slate-400">
+          Submit your questions below
+        </p>
+      </div>
+      ```
+      
+      ## Performance
+      
+      - Use PurgeCSS in production (built into Tailwind)
+      - Avoid excessive class variations
+      - Group related components for better tree-shaking
+      
+      ## Accessibility
+      
+      - Ensure proper color contrast ratios
+      - Use semantic HTML elements with appropriate Tailwind classes
+      - Implement proper focus states for interactive elements
+      
+      ```tsx
+      // Good: Accessible button with focus states
+      <button 
+        type="submit"
+        className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        Submit
+      </button>
+      ```
+
+examples:
+  - input: |
+      // Bad: Inconsistent spacing and poor dark mode implementation
+      <div className="p-5 bg-white mb-6">
+        <h2 className="text-xl mb-4 text-gray-800">Recent Questions</h2>
+        <div className="grid gap-5">
+          {questions.map(q => (
+            <div key={q.id} className="border p-3 rounded">
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold' }}>{q.title}</h3>
+              <p className="text-gray-600">{q.content}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    output: |
+      // Good: Consistent spacing, semantic HTML, and proper dark mode
+      <section className="p-6 bg-card text-card-foreground rounded-lg mb-6">
+        <h2 className="text-xl font-semibold mb-4">Recent Questions</h2>
+        <div className="grid gap-4">
+          {questions.map(q => (
+            <article key={q.id} className="border rounded-md p-4 hover:shadow-sm transition-shadow">
+              <h3 className="text-base font-medium">{q.title}</h3>
+              <p className="text-muted-foreground mt-2">{q.content}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

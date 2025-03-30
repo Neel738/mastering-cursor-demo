@@ -6,7 +6,7 @@ alwaysApply: true
 # Git Conventional Commits
 
 Rule for automatically committing changes made by CursorAI using conventional commits format.
-
+AT THE END OF EVERY SIZABLE CHANGE - PLEASE COMMIT IT. WITH A NICE MESSAGE.
 <rule>
 name: conventional_commits
 description: Automatically commit changes made by CursorAI using conventional commits format

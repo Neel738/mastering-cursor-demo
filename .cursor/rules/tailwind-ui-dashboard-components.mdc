@@ -1,0 +1,169 @@
+---
+description: 
+globs: *.tsx,*.jsx
+alwaysApply: false
+---
+
+<rule>
+name: vision_pro_dashboard_components
+description: Guidelines for creating dashboard components with Vision Pro aesthetics
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$"
+
+actions:
+  - type: suggest
+    message: |
+      # Vision Pro Dashboard UI Components
+      
+      Follow these guidelines for creating dashboard components with Vision Pro aesthetics:
+      
+      ## Dashboard Layout Structure
+      
+      ```tsx
+      // Dashboard layout structure
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-vp-6 md:p-vp-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-vp-6">
+          {/* Dashboard cards go here */}
+        </div>
+      </div>
+      ```
+      
+      ## Data Visualization Components
+      
+      Use glass cards for charts and visualizations:
+      
+      ```tsx
+      <GlassCard className="p-vp-6 h-full">
+        <h3 className="text-vp-subheading text-vp-text-primary-light dark:text-vp-text-primary-dark mb-vp-4">
+          Analytics Overview
+        </h3>
+        <div className="h-64">
+          {/* Chart component goes here */}
+        </div>
+      </GlassCard>
+      ```
+      
+      ## Stat Cards
+      
+      ```tsx
+      // Stat Card Component
+      interface StatCardProps {
+        title: string;
+        value: string | number;
+        change?: number;
+        icon?: React.ReactNode;
+      }
+      
+      export const StatCard = ({ title, value, change, icon }: StatCardProps) => {
+        return (
+          <GlassCard variant="default" className="p-vp-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-vp-caption text-vp-text-secondary-light dark:text-vp-text-secondary-dark">
+                  {title}
+                </p>
+                <h4 className="text-vp-heading text-vp-text-primary-light dark:text-vp-text-primary-dark mt-vp-2">
+                  {value}
+                </h4>
+                {change !== undefined && (
+                  <p className={`text-vp-caption mt-vp-2 ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {change >= 0 ? '↑' : '↓'} {Math.abs(change)}%
+                  </p>
+                )}
+              </div>
+              {icon && (
+                <div className="p-vp-2 rounded-full bg-vp-accent-primary/10">
+                  {icon}
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        );
+      }
+      ```
+      
+      ## Interactive Elements
+      
+      ```tsx
+      // Filter/Dropdown Component
+      <div className="relative">
+        <select 
+          className="appearance-none backdrop-blur-md bg-vp-glass-light/50 dark:bg-vp-glass-dark/50 
+                     border border-vp-border-light dark:border-vp-border-dark 
+                     rounded-vp-md py-vp-2 px-vp-4 pr-vp-8 
+                     text-vp-body text-vp-text-primary-light dark:text-vp-text-primary-dark
+                     focus:outline-none focus:ring-2 focus:ring-vp-accent-primary
+                     transition-all duration-vp-normal"
+        >
+          <option>Last 7 days</option>
+          <option>Last 30 days</option>
+          <option>Last 90 days</option>
+        </select>
+        <div className="absolute inset-y-0 right-0 flex items-center px-vp-2 pointer-events-none">
+          <ChevronDownIcon className="w-4 h-4 text-vp-text-secondary-light dark:text-vp-text-secondary-dark" />
+        </div>
+      </div>
+      ```
+      
+      ## Data Tables
+      
+      ```tsx
+      <GlassCard className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-vp-border-light dark:border-vp-border-dark">
+                <th className="text-left p-vp-4 text-vp-caption font-medium text-vp-text-secondary-light dark:text-vp-text-secondary-dark">
+                  Name
+                </th>
+                <th className="text-left p-vp-4 text-vp-caption font-medium text-vp-text-secondary-light dark:text-vp-text-secondary-dark">
+                  Status
+                </th>
+                <th className="text-right p-vp-4 text-vp-caption font-medium text-vp-text-secondary-light dark:text-vp-text-secondary-dark">
+                  Value
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-vp-border-light dark:border-vp-border-dark">
+                <td className="p-vp-4 text-vp-body text-vp-text-primary-light dark:text-vp-text-primary-dark">
+                  Example Item
+                </td>
+                <td className="p-vp-4">
+                  <span className="inline-flex items-center px-vp-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </span>
+                </td>
+                <td className="p-vp-4 text-right text-vp-body text-vp-text-primary-light dark:text-vp-text-primary-dark">
+                  $1,234
+                </td>
+              </tr>
+              {/* More rows */}
+            </tbody>
+          </table>
+        </div>
+      </GlassCard>
+      ```
+
+examples:
+  - input: |
+      // Basic dashboard card
+      <div className="bg-white rounded-lg p-4 shadow-md">
+        <h3 className="text-lg font-bold mb-2">Users</h3>
+        <p className="text-2xl">1,234</p>
+        <p className="text-sm text-green-500">+5.2%</p>
+      </div>
+    output: |
+      // Vision Pro dashboard card
+      <StatCard 
+        title="Users"
+        value="1,234"
+        change={5.2}
+        icon={<UserIcon className="w-5 h-5 text-vp-accent-primary" />}
+      />
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

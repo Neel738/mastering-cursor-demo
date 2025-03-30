@@ -1,0 +1,257 @@
+---
+description: State Management Best Practices with React Query and Zustand
+globs: *.ts,*.tsx,*.js,*.jsx
+alwaysApply: false
+---
+
+<rule>
+name: state_management_best_practices
+description: Guidelines for implementing state management with React Query and Zustand
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.ts$|\\.js$|\\.jsx$"
+
+actions:
+  - type: suggest
+    message: |
+      # State Management Best Practices
+      
+      ## React Query for Server State
+      
+      - Use React Query for all server state management
+      - Create custom hooks for data fetching
+      - Implement appropriate caching and refetching strategies
+      - Handle loading, error, and success states consistently
+      
+      ```tsx
+      // Good: React Query implementation for questions
+      import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+      
+      // Custom hook for fetching questions
+      export function useQuestions(linkId: string) {
+        return useQuery({
+          queryKey: ['questions', linkId],
+          queryFn: () => fetchQuestions(linkId),
+          staleTime: 1000 * 60 * 5, // 5 minutes
+          refetchOnWindowFocus: true,
+        });
+      }
+      
+      // Custom hook for submitting a question
+      export function useSubmitQuestion() {
+        const queryClient = useQueryClient();
+        
+        return useMutation({
+          mutationFn: (newQuestion) => submitQuestion(newQuestion),
+          onSuccess: (data, variables) => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ 
+              queryKey: ['questions', variables.linkId] 
+            });
+            
+            // Or optimistically update the cache
+            queryClient.setQueryData(['questions', variables.linkId], (old) => {
+              return [...old, data];
+            });
+          },
+        });
+      }
+      
+      // Using the hooks in a component
+      function QuestionsList({ linkId }) {
+        const { data, isLoading, error } = useQuestions(linkId);
+        const { mutate, isPending } = useSubmitQuestion();
+        
+        if (isLoading) return <div>Loading questions...</div>;
+        if (error) return <div>Error loading questions</div>;
+        
+        return (
+          <div>
+            {data.map(question => (
+              <QuestionCard key={question.id} question={question} />
+            ))}
+            
+            <QuestionForm 
+              onSubmit={(newQuestion) => mutate({ ...newQuestion, linkId })}
+              isSubmitting={isPending}
+            />
+          </div>
+        );
+      }
+      ```
+      
+      ## Zustand for Client State
+      
+      - Use Zustand for global UI state management
+      - Create focused, specific stores
+      - Implement proper TypeScript types
+      - Keep store definitions simple and modular
+      
+      ```tsx
+      // Good: Zustand store implementation
+      import { create } from 'zustand';
+      
+      interface UIState {
+        isDarkMode: boolean;
+        sidebarOpen: boolean;
+        toggleDarkMode: () => void;
+        setSidebarOpen: (open: boolean) => void;
+      }
+      
+      export const useUIStore = create<UIState>((set) => ({
+        isDarkMode: false,
+        sidebarOpen: true,
+        toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+        setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      }));
+      
+      // Using the store in components
+      function ThemeToggle() {
+        const { isDarkMode, toggleDarkMode } = useUIStore();
+        
+        return (
+          <button onClick={toggleDarkMode}>
+            {isDarkMode ? <SunIcon /> : <MoonIcon />}
+          </button>
+        );
+      }
+      ```
+      
+      ## Combining React Query and Zustand
+      
+      - Use React Query for server data
+      - Use Zustand for UI state that doesn't fit in component state
+      - Keep clear boundaries between the two
+      
+      ```tsx
+      // Good: Combining React Query and Zustand
+      function QuestionsPage() {
+        // Server state with React Query
+        const { data: questions, isLoading } = useQuestions();
+        
+        // UI state with Zustand
+        const { filterType, setFilterType } = useFilterStore();
+        
+        // Derived state combining both
+        const filteredQuestions = useMemo(() => {
+          if (!questions) return [];
+          return questions.filter(q => q.status === filterType);
+        }, [questions, filterType]);
+        
+        return (
+          <div>
+            <FilterControls 
+              current={filterType} 
+              onChange={setFilterType} 
+            />
+            
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : (
+              <QuestionList questions={filteredQuestions} />
+            )}
+          </div>
+        );
+      }
+      ```
+      
+      ## Best Practices
+      
+      - Keep state as close as possible to where it's used
+      - Implement proper error handling and loading states
+      - Use selectors to optimize renders
+      - Consider using middleware for debugging and persistence
+      
+      ## Performance Considerations
+      
+      - Use React Query's selective refetching
+      - Implement proper dependency arrays in hooks
+      - Use stable references for callbacks
+      - Split stores and queries into logical domains
+
+examples:
+  - input: |
+      // Bad: Not using React Query for server state
+      function QuestionList() {
+        const [questions, setQuestions] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        
+        useEffect(() => {
+          fetch('/api/questions')
+            .then(res => res.json())
+            .then(data => {
+              setQuestions(data);
+              setLoading(false);
+            })
+            .catch(err => {
+              setError(err);
+              setLoading(false);
+            });
+        }, []);
+        
+        // ...render code
+      }
+    output: |
+      // Good: Using React Query for server state
+      function QuestionList() {
+        const { data: questions, isLoading, error } = useQuery({
+          queryKey: ['questions'],
+          queryFn: () => fetch('/api/questions').then(res => res.json()),
+          staleTime: 1000 * 60 * 5, // 5 minutes
+        });
+        
+        if (isLoading) return <div>Loading questions...</div>;
+        if (error) return <div>Error loading questions</div>;
+        
+        // ...render code with questions
+      }
+
+  - input: |
+      // Bad: Global variables and unstructured state
+      let darkMode = false;
+      
+      function toggleDarkMode() {
+        darkMode = !darkMode;
+        document.body.classList.toggle('dark-mode');
+      }
+      
+      function DarkModeToggle() {
+        return (
+          <button onClick={toggleDarkMode}>
+            Toggle Dark Mode
+          </button>
+        );
+      }
+    output: |
+      // Good: Using Zustand for UI state
+      import { create } from 'zustand';
+      
+      interface ThemeState {
+        isDarkMode: boolean;
+        toggleDarkMode: () => void;
+      }
+      
+      export const useThemeStore = create<ThemeState>((set) => ({
+        isDarkMode: false,
+        toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+      }));
+      
+      function DarkModeToggle() {
+        const { isDarkMode, toggleDarkMode } = useThemeStore();
+        
+        useEffect(() => {
+          document.body.classList.toggle('dark-mode', isDarkMode);
+        }, [isDarkMode]);
+        
+        return (
+          <button onClick={toggleDarkMode}>
+            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
+        );
+      }
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

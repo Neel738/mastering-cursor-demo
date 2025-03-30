@@ -1,0 +1,70 @@
+---
+description: 
+globs: *.tsx,*.jsx,*.css,*.scss
+alwaysApply: false
+---
+
+<rule>
+name: vision_pro_aesthetic
+description: Guidelines for creating UI components with Apple Vision Pro aesthetic
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$|\\.css$|\\.scss$"
+
+actions:
+  - type: suggest
+    message: |
+      # Vision Pro UI Aesthetic Guidelines
+      
+      When creating UI components, follow these Vision Pro-inspired design principles:
+      
+      ## Visual Characteristics
+      
+      - **Glassmorphism**: Use background blur effects with semi-transparency
+      - **Depth**: Implement subtle layering with shadow work
+      - **Minimalism**: Clean interfaces with ample whitespace
+      - **Typography**: SF Pro Display or similar sans-serif fonts
+      - **Colors**: Muted, desaturated palette with high contrast options
+      
+      ## Tailwind Implementation
+      
+      ```tsx
+      // Example component with Vision Pro aesthetic
+      <div className="backdrop-blur-md bg-white/20 dark:bg-black/20 
+                      border border-white/10 dark:border-white/5
+                      shadow-lg rounded-2xl p-6">
+        <h2 className="text-xl font-medium text-gray-900 dark:text-white">
+          Title
+        </h2>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          Content
+        </p>
+      </div>
+      ```
+      
+      ## Animation
+      
+      - Prefer subtle, fluid transitions
+      - Use spring physics for natural movement
+      - Implement hover states with gentle scale transforms
+
+examples:
+  - input: |
+      // Bad implementation
+      <div className="bg-blue-500 rounded-md p-4">
+        <h2 className="text-white font-bold">Dashboard</h2>
+      </div>
+    output: |
+      // Vision Pro aesthetic
+      <div className="backdrop-blur-md bg-white/20 dark:bg-black/20 
+                      border border-white/10 dark:border-white/5
+                      shadow-lg rounded-2xl p-6">
+        <h2 className="text-xl font-medium text-gray-900 dark:text-white">
+          Dashboard
+        </h2>
+      </div>
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

@@ -1,0 +1,127 @@
+---
+description: 
+globs: *.tsx,*.jsx,*.css,*.scss
+alwaysApply: false
+---
+
+<rule>
+name: vision_pro_animations
+description: Guidelines for implementing animations with Vision Pro aesthetics
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$|\\.css$|\\.scss$"
+
+actions:
+  - type: suggest
+    message: |
+      # Vision Pro Animation Guidelines
+      
+      Follow these principles for animations that match the Vision Pro aesthetic:
+      
+      ## Animation Principles
+      
+      - **Subtlety**: Animations should be gentle and unobtrusive
+      - **Fluidity**: Movements should feel natural and smooth
+      - **Purpose**: Every animation should serve a purpose (feedback, guidance, etc.)
+      - **Performance**: Optimize for 60fps, prefer GPU-accelerated properties
+      
+      ## Animation Timing
+      
+      ```js
+      // In your tailwind.config.js
+      const transitionTimingFunction = {
+        'vp-spring': 'cubic-bezier(0.42, 0, 0.58, 1)',
+        'vp-ease-out': 'cubic-bezier(0, 0, 0.2, 1)',
+        'vp-ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
+      }
+      
+      const transitionDuration = {
+        'vp-fast': '150ms',
+        'vp-normal': '300ms',
+        'vp-slow': '500ms',
+      }
+      ```
+      
+      ## Common Animation Patterns
+      
+      ### Hover Effects
+      
+      ```tsx
+      // Subtle scale on hover
+      <button className="transform transition-transform duration-vp-normal ease-vp-spring hover:scale-105">
+        Button Text
+      </button>
+      
+      // Opacity change on hover
+      <div className="transition-opacity duration-vp-normal hover:opacity-80">
+        Content
+      </div>
+      ```
+      
+      ### Entrance Animations
+      
+      ```tsx
+      // Fade in
+      <div className="animate-fade-in">Content</div>
+      
+      // Define in your CSS or Tailwind config
+      .animate-fade-in {
+        animation: fadeIn 500ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      ```
+      
+      ### Micro-interactions
+      
+      ```tsx
+      // Button press effect
+      <button className="transform active:scale-95 transition-transform duration-vp-fast">
+        Press Me
+      </button>
+      
+      // Focus ring
+      <input className="transition-shadow duration-vp-normal focus:ring-2 focus:ring-vp-accent-primary focus:ring-opacity-50" />
+      ```
+      
+      ## Framer Motion Integration
+      
+      For more complex animations, use Framer Motion with Vision Pro-inspired values:
+      
+      ```tsx
+      import { motion } from 'framer-motion';
+      
+      // Card entrance animation
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ 
+          duration: 0.5, 
+          ease: [0.42, 0, 0.58, 1],
+          staggerChildren: 0.1
+        }}
+        className="bg-vp-glass-light dark:bg-vp-glass-dark rounded-vp-lg p-vp-6"
+      >
+        {/* Content */}
+      </motion.div>
+      ```
+
+examples:
+  - input: |
+      // Abrupt, harsh animation
+      <div className="transition-all duration-100 ease-linear hover:scale-110 hover:bg-blue-700">
+        Hover me
+      </div>
+    output: |
+      // Vision Pro smooth animation
+      <div className="transition-all duration-vp-normal ease-vp-spring hover:scale-105 hover:bg-vp-accent-primary/90">
+        Hover me
+      </div>
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

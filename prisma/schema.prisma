@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models
+model User {
+  id             String         @id @default(uuid())
+  name           String
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  questionLinks  QuestionLink[]
+
+  @@map("users")
+}
+
+model QuestionLink {
+  id          String      @id @default(uuid())
+  slug        String      @unique
+  title       String
+  description String?
+  expiresAt   DateTime?   @map("expires_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  userId      String      @map("user_id")
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions   Question[]
+
+  @@index([userId])
+  @@map("question_links")
+}
+
+model Question {
+  id             String       @id @default(uuid())
+  content        String
+  submitterName  String       @map("submitter_name")
+  isAnswered     Boolean      @default(false) @map("is_answered")
+  isFavorite     Boolean      @default(false) @map("is_favorite")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  questionLinkId String       @map("question_link_id")
+  questionLink   QuestionLink @relation(fields: [questionLinkId], references: [id], onDelete: Cascade)
+
+  @@index([questionLinkId])
+  @@map("questions")
+}

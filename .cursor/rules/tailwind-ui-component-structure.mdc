@@ -1,0 +1,106 @@
+---
+description: 
+globs: *.tsx,*.jsx
+alwaysApply: false
+---
+
+<rule>
+name: vision_pro_component_structure
+description: Guidelines for structuring React components with Vision Pro aesthetics
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$"
+
+actions:
+  - type: suggest
+    message: |
+      # Vision Pro Component Structure Best Practices
+      
+      Follow these guidelines for structuring React components with a Vision Pro aesthetic:
+      
+      ## Component Organization
+      
+      - Create atomic, reusable components
+      - Implement variants using Tailwind's group modifiers
+      - Use composition over inheritance
+      - Implement responsive designs that adapt gracefully across device sizes
+      
+      ## Glass Card Pattern
+      
+      ```tsx
+      // GlassCard.tsx - Reusable glass card component
+      interface GlassCardProps {
+        children: React.ReactNode;
+        variant?: 'default' | 'elevated' | 'subtle';
+        className?: string;
+      }
+      
+      export const GlassCard = ({ 
+        children, 
+        variant = 'default',
+        className = '' 
+      }: GlassCardProps) => {
+        const baseStyles = "backdrop-blur-md rounded-vp-lg transition-all duration-300";
+        
+        const variantStyles = {
+          default: "bg-vp-glass-light dark:bg-vp-glass-dark border border-vp-border-light dark:border-vp-border-dark shadow-vp-medium",
+          elevated: "bg-vp-glass-light/80 dark:bg-vp-glass-dark/80 border border-vp-border-light dark:border-vp-border-dark shadow-vp-strong",
+          subtle: "bg-vp-glass-light/40 dark:bg-vp-glass-dark/40 shadow-vp-soft"
+        };
+        
+        return (
+          <div className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
+            {children}
+          </div>
+        );
+      }
+      ```
+      
+      ## Component Composition
+      
+      ```tsx
+      // Example of component composition
+      <GlassCard variant="elevated" className="p-vp-6">
+        <div className="flex items-center justify-between mb-vp-4">
+          <h2 className="text-vp-heading text-vp-text-primary-light dark:text-vp-text-primary-dark">
+            Dashboard Overview
+          </h2>
+          <button className="text-vp-accent-primary hover:opacity-80 transition-opacity">
+            <SettingsIcon className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="space-y-vp-4">
+          {/* Content goes here */}
+        </div>
+      </GlassCard>
+      ```
+      
+      ## Spacing & Layout
+      
+      - Use consistent spacing based on the design tokens
+      - Implement grid layouts using Tailwind's grid system
+      - Use flex layouts for component-level arrangements
+      - Maintain adequate whitespace between elements
+
+examples:
+  - input: |
+      // Poor component structure
+      <div className="p-4 bg-white bg-opacity-50 rounded-lg shadow-md">
+        <h3 className="text-lg font-bold">Widget Title</h3>
+        <p>Widget content</p>
+        <button className="bg-blue-500 text-white px-3 py-1 rounded">Action</button>
+      </div>
+    output: |
+      // Better component structure
+      <GlassCard variant="default" className="p-vp-6">
+        <h3 className="text-vp-subheading text-vp-text-primary-light dark:text-vp-text-primary-dark mb-vp-4">Widget Title</h3>
+        <p className="text-vp-body text-vp-text-secondary-light dark:text-vp-text-secondary-dark mb-vp-6">Widget content</p>
+        <button className="bg-vp-accent-primary text-white px-vp-4 py-vp-2 rounded-vp-sm hover:opacity-90 transition-opacity">
+          Action
+        </button>
+      </GlassCard>
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

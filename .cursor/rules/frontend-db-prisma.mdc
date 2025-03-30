@@ -1,0 +1,187 @@
+---
+description: Prisma ORM Best Practices
+globs: *.ts,*.js,prisma/*.prisma
+alwaysApply: false
+---
+
+<rule>
+name: prisma_best_practices
+description: Guidelines for implementing Prisma ORM features effectively
+filters:
+  - type: file_extension
+    pattern: "\\.ts$|\\.js$"
+  - type: file_extension
+    pattern: "\\.prisma$"
+
+actions:
+  - type: suggest
+    message: |
+      # Prisma ORM Best Practices
+      
+      ## Schema Design
+      
+      - Use clear, descriptive model names
+      - Implement proper relationships between models
+      - Define appropriate field types and constraints
+      - Add helpful comments to document complex relationships
+      
+      ```prisma
+      // Good Prisma schema example
+      model User {
+        id             String          @id @default(uuid())
+        displayName    String
+        userType       UserType
+        createdAt      DateTime        @default(now())
+        questionLinks  QuestionLink[]  // One-to-many relationship
+        
+        @@index([userType])
+      }
+      
+      model QuestionLink {
+        id            String      @id @default(uuid())
+        influencerId  String
+        influencer    User        @relation(fields: [influencerId], references: [id])
+        title         String
+        description   String?
+        slug          String      @unique
+        isActive      Boolean     @default(true)
+        expiresAt     DateTime?
+        createdAt     DateTime    @default(now())
+        updatedAt     DateTime    @updatedAt
+        questions     Question[]  // One-to-many relationship
+        
+        @@index([influencerId])
+        @@index([slug])
+      }
+      
+      enum UserType {
+        INFLUENCER
+        VIEWER
+      }
+      ```
+      
+      ## Query Optimization
+      
+      - Use appropriate `include` statements to avoid N+1 queries
+      - Implement pagination for large datasets
+      - Create reusable query functions
+      
+      ```typescript
+      // Good query patterns
+      
+      // Helper function for pagination
+      async function getQuestionsPaginated(linkId: string, page = 1, pageSize = 10) {
+        const skip = (page - 1) * pageSize;
+        
+        const [questions, totalCount] = await Promise.all([
+          prisma.question.findMany({
+            where: { 
+              linkId,
+              status: 'PUBLISHED'
+            },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: pageSize,
+          }),
+          prisma.question.count({
+            where: { 
+              linkId,
+              status: 'PUBLISHED'
+            },
+          })
+        ]);
+        
+        return {
+          questions,
+          pagination: {
+            totalCount,
+            pageCount: Math.ceil(totalCount / pageSize),
+            currentPage: page,
+          }
+        };
+      }
+      ```
+      
+      ## Best Practices
+      
+      - Create a singleton Prisma client instance
+      - Implement proper error handling
+      - Use transactions for related operations
+      
+      ```typescript
+      // lib/prisma.ts - Singleton client
+      import { PrismaClient } from '@prisma/client';
+
+      const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+      export const prisma = globalForPrisma.prisma || new PrismaClient();
+
+      if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+      
+      // Using transactions
+      async function submitQuestionAndIncrementCounter(data) {
+        return prisma.$transaction(async (tx) => {
+          // Create the question
+          const question = await tx.question.create({
+            data: {
+              linkId: data.linkId,
+              content: data.content,
+              submitterName: data.submitterName,
+              status: 'PENDING',
+            }
+          });
+          
+          // Update the stats
+          await tx.questionLink.update({
+            where: { id: data.linkId },
+            data: { totalQuestions: { increment: 1 } }
+          });
+          
+          return question;
+        });
+      }
+      ```
+      
+      ## Security Considerations
+      
+      - Never expose raw Prisma errors to clients
+      - Implement proper access control in your queries
+      - Validate input before passing to Prisma
+      
+      ```typescript
+      // Secure error handling
+      try {
+        const result = await prisma.question.create({ data });
+        return result;
+      } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to create question');
+      }
+      ```
+
+examples:
+  - input: |
+      // Bad: N+1 query problem
+      const links = await prisma.questionLink.findMany();
+      
+      for (const link of links) {
+        const questions = await prisma.question.findMany({
+          where: { linkId: link.id }
+        });
+        link.questions = questions;
+      }
+    output: |
+      // Good: Using include to avoid N+1
+      const links = await prisma.questionLink.findMany({
+        include: {
+          questions: {
+            where: { status: 'PUBLISHED' },
+            orderBy: { createdAt: 'desc' }
+          }
+        }
+      });
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

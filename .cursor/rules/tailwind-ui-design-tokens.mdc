@@ -1,0 +1,123 @@
+---
+description: 
+globs: *.tsx,*.jsx,*.css,*.scss,tailwind.config.*
+alwaysApply: false
+---
+
+<rule>
+name: vision_pro_design_tokens
+description: Guidelines for consistent design tokens in Vision Pro-inspired UI
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.jsx$|\\.css$|\\.scss$|\\.js$|\\.ts$"
+  - type: filename
+    pattern: "tailwind\\.config\\.(js|ts)"
+
+actions:
+  - type: suggest
+    message: |
+      # Vision Pro Design Token System
+      
+      Use these consistent design tokens across your Vision Pro-inspired UI:
+      
+      ## Color Tokens
+      
+      ```js
+      // In tailwind.config.js
+      const colors = {
+        'vp-glass': {
+          light: 'rgba(255, 255, 255, 0.7)',
+          dark: 'rgba(30, 30, 33, 0.7)',
+        },
+        'vp-border': {
+          light: 'rgba(255, 255, 255, 0.1)',
+          dark: 'rgba(255, 255, 255, 0.05)',
+        },
+        'vp-text': {
+          primary: {
+            light: '#1A1A1C',
+            dark: '#FFFFFF',
+          },
+          secondary: {
+            light: '#747478',
+            dark: '#A1A1A6',
+          },
+        },
+        'vp-accent': {
+          primary: '#0077ED',
+          secondary: '#32D74B',
+        },
+      }
+      ```
+      
+      ## Shadow Tokens
+      
+      ```js
+      // In tailwind.config.js
+      const boxShadow = {
+        'vp-soft': '0 4px 30px rgba(0, 0, 0, 0.1)',
+        'vp-medium': '0 8px 32px rgba(0, 0, 0, 0.15)',
+        'vp-strong': '0 12px 40px rgba(0, 0, 0, 0.2)',
+      }
+      ```
+      
+      ## Border Radius Tokens
+      
+      ```js
+      // In tailwind.config.js
+      const borderRadius = {
+        'vp-sm': '0.75rem',
+        'vp-md': '1rem',
+        'vp-lg': '1.5rem',
+        'vp-xl': '2rem',
+      }
+      ```
+      
+      ## Spacing Tokens
+      
+      ```js
+      // In tailwind.config.js
+      const spacing = {
+        'vp-2': '0.5rem',
+        'vp-4': '1rem',
+        'vp-6': '1.5rem',
+        'vp-8': '2rem',
+        'vp-12': '3rem',
+        'vp-16': '4rem',
+      }
+      ```
+      
+      ## Typography Tokens
+      
+      ```js
+      // In tailwind.config.js
+      const fontFamily = {
+        'vp-sans': ['SF Pro Display', 'system-ui', 'sans-serif'],
+      }
+      
+      const fontSize = {
+        'vp-title-large': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'vp-title': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'vp-heading': ['1.5rem', { lineHeight: '1.25', fontWeight: '500' }],
+        'vp-subheading': ['1.25rem', { lineHeight: '1.3', fontWeight: '500' }],
+        'vp-body': ['1rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'vp-caption': ['0.875rem', { lineHeight: '1.4', fontWeight: '400' }],
+      }
+      ```
+
+examples:
+  - input: |
+      // Inconsistent styling
+      <div className="bg-opacity-50 bg-white rounded-md p-4 shadow-md">
+        <h2 className="text-lg font-bold mb-2">Title</h2>
+      </div>
+    output: |
+      // With design tokens
+      <div className="bg-vp-glass-light dark:bg-vp-glass-dark rounded-vp-md p-vp-4 shadow-vp-medium">
+        <h2 className="text-vp-subheading text-vp-text-primary-light dark:text-vp-text-primary-dark mb-vp-2">Title</h2>
+      </div>
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

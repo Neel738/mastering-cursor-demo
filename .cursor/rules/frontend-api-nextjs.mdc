@@ -1,0 +1,159 @@
+---
+description: Next.js App Router Best Practices
+globs: *.ts,*.tsx,*.js,*.jsx
+alwaysApply: false
+---
+
+<rule>
+name: nextjs_best_practices
+description: Guidelines for implementing Next.js App Router features effectively
+filters:
+  - type: file_extension
+    pattern: "\\.tsx$|\\.ts$|\\.js$|\\.jsx$"
+
+actions:
+  - type: suggest
+    message: |
+      # Next.js App Router Best Practices
+      
+      ## Route Organization
+      
+      - Use nested folders for route hierarchy
+      - Implement layout.tsx files for shared UI
+      - Create loading.tsx and error.tsx for better UX
+      - Use page.tsx for the main content of each route
+      
+      ```tsx
+      // Good organization
+      app/
+      ├── layout.tsx         // Root layout
+      ├── page.tsx           // Home page
+      ├── globals.css        // Global styles
+      ├── questions/
+      │   ├── layout.tsx     // Questions layout
+      │   ├── page.tsx       // Questions list page
+      │   ├── loading.tsx    // Loading state
+      │   ├── error.tsx      // Error handling
+      │   └── [id]/          // Dynamic route
+      │       ├── page.tsx   // Question detail page
+      │       └── actions.ts // Server actions
+      ```
+      
+      ## Data Fetching
+      
+      - Use Server Components for data fetching when possible
+      - Implement React Query for client-side state management
+      - Utilize Next.js cache() for optimized fetching
+      
+      ```tsx
+      // Server Component data fetching
+      async function QuestionsPage() {
+        const questions = await fetchQuestions();
+        
+        return (
+          <div>
+            {questions.map(question => (
+              <QuestionCard key={question.id} question={question} />
+            ))}
+          </div>
+        );
+      }
+      ```
+      
+      ## API Routes
+      
+      - Create Route Handlers in the app/api directory
+      - Use zod for request validation
+      - Implement proper error handling and status codes
+      
+      ```tsx
+      // app/api/questions/route.ts
+      import { NextResponse } from 'next/server';
+      import { z } from 'zod';
+      import { prisma } from '@/lib/prisma';
+
+      const questionSchema = z.object({
+        linkId: z.string().uuid(),
+        content: z.string().min(10).max(500),
+        submitterName: z.string().min(2).max(50)
+      });
+
+      export async function POST(request: Request) {
+        try {
+          const body = await request.json();
+          const validated = questionSchema.parse(body);
+          
+          const question = await prisma.question.create({
+            data: validated
+          });
+          
+          return NextResponse.json(question, { status: 201 });
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            return NextResponse.json({ errors: error.errors }, { status: 400 });
+          }
+          return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        }
+      }
+      ```
+      
+      ## Performance Optimization
+      
+      - Use Next.js Image component for optimized images
+      - Implement proper metadata for SEO
+      - Utilize React.lazy and dynamic imports for code splitting
+      
+      ```tsx
+      // Metadata example
+      export const metadata = {
+        title: 'Q&A Platform - Ask Questions',
+        description: 'Submit your questions to your favorite influencers',
+      };
+      
+      // Image optimization
+      import Image from 'next/image';
+      
+      function Avatar({ user }) {
+        return (
+          <Image
+            src={user.avatarUrl}
+            alt={user.name}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+        );
+      }
+      ```
+
+examples:
+  - input: |
+      // Bad: Inefficient data fetching in Client Component
+      'use client';
+      
+      function QuestionsPage() {
+        const [questions, setQuestions] = useState([]);
+        
+        useEffect(() => {
+          fetch('/api/questions')
+            .then(res => res.json())
+            .then(data => setQuestions(data));
+        }, []);
+        
+        return (/* rendering code */);
+      }
+    output: |
+      // Good: Using Server Component for data fetching
+      async function QuestionsPage() {
+        const questions = await prisma.question.findMany({
+          where: { status: 'published' },
+          orderBy: { createdAt: 'desc' },
+        });
+        
+        return (/* rendering code */);
+      }
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 
