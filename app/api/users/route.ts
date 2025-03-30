@@ -5,23 +5,57 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name } = body;
+    const { name, action = 'create' } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
-    // Create a new user
-    const user = await prisma.user.create({
-      data: {
-        name,
-      },
-    });
+    // Check if this is a login or create action
+    if (action === 'login') {
+      // Find user by name for login
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          name: {
+            equals: name,
+            mode: 'insensitive', // Case insensitive search
+          },
+        },
+      });
 
-    return NextResponse.json(user);
+      if (!existingUser) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(existingUser);
+    } else {
+      // For create action, check if user with same name already exists
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          name: {
+            equals: name,
+            mode: 'insensitive', // Case insensitive search
+          },
+        },
+      });
+
+      if (existingUser) {
+        // Return existing user instead of creating a duplicate
+        return NextResponse.json(existingUser);
+      }
+
+      // Create a new user
+      const user = await prisma.user.create({
+        data: {
+          name,
+        },
+      });
+
+      return NextResponse.json(user);
+    }
   } catch (error) {
-    console.error('Failed to create user:', error);
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+    console.error('Failed to create/login user:', error);
+    return NextResponse.json({ error: 'Failed to process user request' }, { status: 500 });
   }
 }
 
