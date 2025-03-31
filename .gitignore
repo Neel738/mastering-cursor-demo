@@ -1,5 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+/app_demo/node_modules
+/app_demo/.next
+/app_demo/.env.local
+/app_demo/.env.development.local
+/app_demo/.env.test.local
+/app_demo/.env.production.local
+/app_demo/.env
+
 # dependencies
 /node_modules
 /.pnp
